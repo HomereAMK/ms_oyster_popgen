@@ -16,15 +16,15 @@ populations --in-path 05-stacks --popmap $POP_MAP \
 
 # Obtain header of sumstats file
 echo "Collecting header for sumstats file"
-grep -E '^#' 07-filtered_vcfs/populations.sumstats.tsv | tail -n 1 > 07-filtered_vcfs/populations.sumstats_header.txt
+grep -E '^#' populations.sumstats.tsv | tail -n 1 > 07-filtered_vcfs/populations.sumstats_header.txt
 
 # Make blacklist with loci out of HWE
 R --slave -e 'source("../ms_oyster_popgen/01_scripts/hwe_count_per_pop.R")'
 echo "Saving the blacklist to 01-info_files"
 
 # Identify most recent blacklist (to use)
-NUM_BLACKLIST=$(ls -lth 01-info_files/blacklist* | awk -F"01-info_files/" '{ print $2 }' - | wc -l)
-BLACKLIST=$(ls -lth 01-info_files/blacklist* | awk '{ print $9 }' - | head -n 1)
+NUM_BLACKLIST=$(ls -lth blacklist* | awk -F '{ print $2 }' - | wc -l)
+BLACKLIST=$(ls -lth blacklist* | awk '{ print $9 }' - | head -n 1)
 
 # Reporting on blacklist
 if [ NUM_BLACKLIST > 1 ]
@@ -48,11 +48,11 @@ populations --in-path 05-stacks --popmap $POP_MAP \
 
 echo "Saving single-snp PLINK data - Differentiation"
 mkdir 11-adegenet_analysis 2>/dev/null
-cp 07-filtered_vcfs/*plink* 11-adegenet_analysis 
+cp *plink* 11-adegenet_analysis 
 
 echo "Saving all other single-snp data - Diversity"
 mkdir 09-diversity_stats 2>/dev/null 
-cp 07-filtered_vcfs/* 09-diversity_stats
+cp * 09-diversity_stats
 
 
 #### 3. Filter and output loci for population genetic analysis (haplotypes) ####
