@@ -12,17 +12,17 @@ max_pops_out_hwe <- 2
 pval_cutoff <- 0.01
 
 # Set working directory
-setwd("/mnt/data/01_moore_oyster_project/stacks_workflow/")
+setwd("/home/projects/dp_00007/people/hmon/RadSeqBamArno/stacks_analysis14sept/")
 
 # Read in sumstats (contains HWE val)
-populations_sumstats <- read.table(file = "07-filtered_vcfs/populations.sumstats.tsv", header = F, sep = "\t"
+populations_sumstats <- read.table(file = "populations.sumstats.tsv", header = F, sep = "\t"
           )
 head(populations_sumstats)
 nrow(populations_sumstats) # Number of pop x SNP
 ncol(populations_sumstats)
 
 # Read in header
-header <- as.matrix(read.table(file = "07-filtered_vcfs/populations.sumstats_header.txt", sep = "\t", stringsAsFactors = F))
+header <- as.matrix(read.table(file = "populations.sumstats_header.txt", sep = "\t", stringsAsFactors = F))
 header <- gsub(pattern = " ", replacement = "_", x = header) # remove spaces
 
 
