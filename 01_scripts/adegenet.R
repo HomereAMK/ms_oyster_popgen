@@ -19,7 +19,7 @@
 # require(devtools)
 # install_version("hierfstat", version = "0.04-22", repos = "http://cran.us.r-project.org") # compoplot functional
 # install_github("jgx65/hierfstat") # compoplot not functional
-# install.packages("hierfstat")
+install.packages("hierfstat")
 library("hierfstat")
 
 # install_version("adegenet", version = "2.0.1", repos = "http://cran.us.r-project.org") # compoplot functional
