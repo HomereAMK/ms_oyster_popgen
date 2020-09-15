@@ -46,7 +46,7 @@ if(Sys.info()["nodename"] == "stark"){
   print("On Xavier, ready to go")
   setwd("~/Documents/01_moore_oyster_project/stacks_workflow_all_data/") # Xavier
 } else {
-  print("You are on an unrecognized system, please set working directory manually")
+  print("/home/projects/dp_00007/people/hmon/RadSeqBamArno/stacks_analysis14sept/")
 }
 
 ## Info
