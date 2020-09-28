@@ -22,31 +22,40 @@ library("poppr")
 
 
 # Set working directory for stark or xavier
-# if on a different system, prompt for working directory
-if(Sys.info()["nodename"] == "stark"){ 
-  print("On Stark, ready to go")
-  setwd("/mnt/data/bsuther/01_moore_oyster_project/stacks_workflow/") # stark
-} else if(Sys.info()["nodename"] == "Xavier"){
-  print("On Xavier, ready to go")
-  setwd("~/Documents/01_moore_oyster_project/stacks_workflow_all_data/") # Xavier
-} else {
-  print("You are on an unrecognized system, please set working directory manually")
-}
+
 
 ## Info
 # sessionInfo()
+output.dir <- "./"
+input.FN <- "populations_single_snp_HWE.raw"
 
-# Set variables
-output.dir <- "11-adegenet_analysis/"
+#### 1. Import data ####
+print(paste0("Loading data from ", input.FN))
+my.data <- read.PLINK(file = input.FN)
+my.data
+####6. Genlight to genind conversion (indiv. genotypes) ####
+# Convert genlight to matrix
+my.data.mat <- as.matrix(my.data)
+my.data.mat[1:5,1:5]
+
+# Translate the number of minor allele to genind format
+my.data.mat[my.data.mat == 0] <- "1/1" #homozygote reference
+my.data.mat[my.data.mat == 1] <- "1/2" #heterozygote
+my.data.mat[my.data.mat == 2] <- "2/2" #homozygote alternate
+my.data.mat[1:5,1:5]
+
+# Convert matrix to genind
+my.data.gid <- df2genind(my.data.mat, sep = "/", ploidy = 2) # convert df to genind
+
+# Transfer pop attributes
+pop(my.data.gid) <- pop(my.data) 
+
 
 #### 01. Input data and prepare ####
-## Load inputs
-# Load part 1 results
-load(file = paste0(output.dir, "adegenet_output.RData"))
 my.data.gid
 
 # Load colours file
-my_cols.df <- read.csv(file = "../ms_oyster_popgen/00_archive/my_cols.csv", stringsAsFactors = F)
+my_cols.df <- read.csv(file = "my_cols.csv", stringsAsFactors = F)
 str(my_cols.df)
 
 #### 02. Private alleles
@@ -61,30 +70,25 @@ names(sep.obj)
 
 # Create list of various combinations of repooled pops
 # "global" is the comparison of one representative from each main pop
-datatype.list <- list()
-datatype.list[["global"]] <- repool(sep.obj$PEN
-                                    , sep.obj$CHN, sep.obj$QDC, sep.obj$RSC
-                                    , sep.obj$DPB, sep.obj$ROS, sep.obj$GUR
-                                    , sep.obj$FRA
-                                    , sep.obj$JPN
-)
+#datatype.list <- list()
+#datatype.list[["global"]] <- repool(
 
 datatype.list[["all"]] <- my.data.gid
 
-datatype.list[["bare.minimum"]] <- repool(sep.obj$PEN
-                                          , sep.obj$CHN
-                                          , sep.obj$DPB
-                                          , sep.obj$GUR
+datatype.list[["bare.minimum"]] <- repool(sep.obj$MORLAIX
+                                          , sep.obj$ROZ
+                                          , sep.obj$QUIBERON
+                                          , sep.obj$CORNWALL, sep.obj$USA
                                           
 )
 
 
 ## Select the dataset
 ## Main analysis:
-global.gid <- datatype.list[["all"]]
+#global.gid <- datatype.list[["all"]]
 
 ## Test analyses
-#global.gid <- datatype.list[["bare.minimum"]]
+global.gid <- datatype.list[["bare.minimum"]]
 #global.gid <- datatype.list[["global"]]
 
 ## Create a df that defines the strata for each individual in the rows
@@ -98,13 +102,13 @@ str(strata.df)
 strata.df$repunit <- strata.df$indiv.pop
 
 # Grouping similar pops into the same strata (not all will be present in all datasets, but that is OK)
-strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "CHNF", replacement = "CHN")
-strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "FRAF", replacement = "FRA")
-strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "PENF", replacement = "BC")
-strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "PIP", replacement = "BC")
-strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "PEN", replacement = "BC")
-strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "SER", replacement = "BC")
-strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "HIS", replacement = "BC")
+#strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "CHNF", replacement = "CHN")
+#strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "FRAF", replacement = "FRA")
+#strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "PENF", replacement = "BC")
+#strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "PIP", replacement = "BC")
+#strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "PEN", replacement = "BC")
+#strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "SER", replacement = "BC")
+#strata.df$repunit <- gsub(x = strata.df$repunit, pattern = "HIS", replacement = "BC")
 
 unique(strata.df$repunit)
 
@@ -132,7 +136,7 @@ per_repunit.privallele[,1:5]
 
 # Quantify the number of observations of each private allele in each population
 # e.g.,
-table(per_repunit.privallele["BC",])
+table(per_repunit.privallele["MORLAIX",])
 
 # for all repunits
 for(i in 1:nrow(per_repunit.privallele)){
